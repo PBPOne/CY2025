@@ -147,6 +147,7 @@ select
 				and SalesCat <> 'prime')
 				or 
 				PartnerCode in 
+
 				('IP165945','IP214251','IP379325','IP164070','IP224017','IP122618','IP290393','IP261305','IP332315','IP115100','IP232014','IP268411','IP366164','IP228903','IP380100','IP49038','IP201528','IP333920')
 ),
 
@@ -255,4 +256,3 @@ cte as
 		group by PartnerCode,Product,MON1
 	)
 select * from cte
-where partnercode= 'IP165945'
