@@ -242,10 +242,11 @@ tr1 as
 			 
 	from tr 
 		)
-select top 10
+select --top 10
 	PartnerCode,leadid,Product,MON1,Total_pr,netpr,Accrual_Net,
 	plan_type,BookingMode,BT,[Insurer Name],SumInsured, BusinessType,SubProduct, VehicleSubClass,
 	product_updated, PlanName, PaymentPeriodicity,PayoutProdCat,IsComplianceN
 
 	from tr1 --where IsComplianceN= 'yes' --and product= 'Motor' --and  PartnerCode= 'IP108088' 
+
 
