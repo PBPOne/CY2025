@@ -1,23 +1,30 @@
 with PBP as (
-select PartnerCode, sum(AddonCoins) as PBP_Coins, 0 as Contest_Coins  FROM [PBPOneDB].[dbo].[PartnerQuarterlyCalculation]
+select PartnerCode, sum(AddonCoins) as PBP_Coins, 0 as Contest_Coins, 0 as welcome_bonus  FROM [PBPOneDB].[dbo].[PartnerQuarterlyCalculation]
 WHERE IsActive=1 and Quarter <> 'Q1'
 group by PartnerCode
 ),
 Contests as
 (
-select PartnerCode, 0 as PBP_Coins,sum(TotalCoinsEarned) as Contest_Coins from [PBPOneDB].[dbo].ContestCoinsCalculation 
+select PartnerCode, 0 as PBP_Coins,sum(TotalCoinsEarned) as Contest_Coins, 0 as welcome_bonus from [PBPOneDB].[dbo].ContestCoinsCalculation 
 where IsActive =1 and TotalCoinsEarned > 0  and Year = 2025
 group by  PartnerCode
+),
+welcome_bonus as
+(
+select PartnerCode, 0 as PBP_Coins, 0 as Contest_Coins, WelcomeBonus as welcome_bonus from [PBPOneDB].dbo.[PartnerWelcomeBonusDetails]
+where IsActive=1
 ),
 Coins_total as
 (
 select *  from PBP 
 union all 
 select *  from Contests
+union all 
+select *  from welcome_bonus
 ),
 Coins_total_grouped as
 (
-select PartnerCode, sum(PBP_Coins) as PBP_Coins, sum(Contest_Coins) as Contest_Coins   from Coins_total
+select PartnerCode, sum(PBP_Coins) as PBP_Coins, sum(Contest_Coins) as Contest_Coins, sum(welcome_bonus) as welcome_bonus from Coins_total
 group by PartnerCode
 ),
 Redemption as
@@ -29,7 +36,7 @@ Balance as
 (
 select p.*,
 isnull(TotalRedeem,0) as TotalRedeem,
-floor(PBP_Coins + Contest_Coins- isnull(TotalRedeem,0)) as Balance_Coins
+floor(PBP_Coins + Contest_Coins + welcome_bonus - isnull(TotalRedeem,0)) as Balance_Coins
 from Coins_total_grouped p
 left join Redemption r
 on p.PartnerCode= r.PartnerCode
@@ -55,14 +62,5 @@ where Balance_Coins >= 40000
 )
 select * from opt_in_final
 where [Next Club] is not null
-
---and PartnerCode = 'IP383217'
---order by Balance_Coins desc
---select * from Balance where Balance_Coins >= 39900
-
-
-
-
-
-
+order by [Next Club]
 
