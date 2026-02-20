@@ -50,11 +50,12 @@ and WeightedNet >= 4000000
 opt_in_final as
 (
 select  
-b.*, a.AnnualTier, a.WeightedNet,
+b.*, 
+case when a.AnnualTier = 'NA' then 'Not Qualified' else a.AnnualTier end as 'Current Club',
+a.WeightedNet,
 case when a.AnnualTierLevel = 2 and a.WeightedNet >= 15000000 and Balance_Coins >= 150000 then 'One Club'
 	 when a.AnnualTierLevel = 1 and WeightedNet >= 8000000 and Balance_Coins >= 80000 then 'CBO'
 	 when a.AnnualTierLevel = 0 and WeightedNet >= 4000000 and Balance_Coins >= 40000 then 'Masters'
-	 else null
 	 end as 'Next Club'
 from Balance b
 join Annual a on b.PartnerCode = a.PartnerCode
